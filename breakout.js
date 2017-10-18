@@ -64,7 +64,7 @@ window.onload = function() {
         this.vy = -this.vy;
         this.py = this.r;
       }
-      if (this.py > player.py - this.r && this.px > player.px - player.width/2 && this.px < player.px + player.width/2 ) {
+      if (this.py > player.py - this.r && this.px > player.px - player.width/2 && this.px < player.px + player.width/2 && this.py < player.py + player.thickness + this.r) {
         this.vy = -this.vy;
         this.py = player.py - this.r;
       }
