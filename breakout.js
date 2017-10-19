@@ -8,7 +8,7 @@ window.onload = function() {
     
     player = new Player();
     balls = [];
-    var i = 2;
+    var i = 1;
     while (i--) {
       balls.push(new Ball());
     }
@@ -65,7 +65,11 @@ window.onload = function() {
         this.py = this.r;
       }
       if (this.py > player.py - this.r && this.px > player.px - player.width/2 && this.px < player.px + player.width/2 && this.py < player.py + player.thickness + this.r) {
-        this.vy = -this.vy;
+        //this.vy = -this.vy;
+        var r = (player.px + player.width/2 - this.px) / player.width;
+        var a =  r * Math.PI * 0.5 + Math.PI/4;
+        this.vx = Math.cos(a) * this.speed;
+        this.vy = -Math.sin(a) * this.speed;
         this.py = player.py - this.r;
       }
 
@@ -73,7 +77,6 @@ window.onload = function() {
         /* this.vy = -this.vy;
         this.py = canv.height - this.r; */
         this.alive = false;
-        console.log("to delete");
       }
     };
   
@@ -110,7 +113,6 @@ window.onload = function() {
     while(i--){
       if(balls[i].alive === false ){
         balls.splice(i,1);
-        console.log("dead!");
       }
       
     }
