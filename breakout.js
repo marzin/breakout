@@ -52,7 +52,6 @@ window.onload = function() {
     this.width = 20;
     this.height = 10;
     this.life = life;
-    this.alive = true;
 
     this.draw = function() {
       ctx.beginPath();
@@ -106,6 +105,13 @@ window.onload = function() {
     this.intersect = function(brick){
         if(this.px > brick.px && this.px < brick.px + brick.width && this.py > brick.py && this.py < brick.py + brick.height){
           console.log('boom');
+          if( (this.px-this.vx < brick.px || this.px-this.vx > brick.px+brick.width) && this.py-this.vy > brick.py && this.py-this.vy < brick.py + brick.height){
+            this.vx=-this.vx;
+          }
+          else if((this.py-this.vy < brick.py || this.py-this.vy > brick.py + brick.height) && this.px-this.vx > brick.px && this.px-this.vx < brick.px + brick.width){
+            this.vy=-this.vy;
+          }
+          brick.life--;
         }
     };
 
@@ -144,7 +150,7 @@ window.onload = function() {
     
     var i = bricks.length;
     while(i--){
-      if(bricks[i].alive === false ){
+      if(bricks[i].life < 1 ){
         bricks.splice(i,1);
       }
     }
