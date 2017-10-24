@@ -7,6 +7,13 @@ window.onload = function() {
     walls = [];
     
     player = new Player();
+
+    bricks = [];
+    var n = 5;
+    while (n--) {
+      bricks.push(new Brick(n%10*20+50 , Math.floor(n/10)*10 + 100, 1));
+    }
+
     balls = [];
     var i = 1;
     while (i--) {
@@ -19,8 +26,8 @@ window.onload = function() {
   function keyPush(evt) {
     switch (evt.keyCode) {
       case 37: //left
-       /*  balls.forEach(function(item) {
-          if(item.r>1){item.r--;}
+       /*  balls.forEach(function(brick) {
+          if(brick.r>1){brick.r--;}
         }); */
         if(player.px>player.width/2){player.px = player.px - player.speed;}
         break;
@@ -28,8 +35,8 @@ window.onload = function() {
         balls.push(new Ball());
         break;
       case 39: //right
-       /*  balls.forEach(function(item) {
-          if(item.r<40){item.r++;}
+       /*  balls.forEach(function(brick) {
+          if(brick.r<40){brick.r++;}
         }); */
         if(player.px<canv.width-player.width/2){player.px = player.px + player.speed;}
         break;
@@ -39,8 +46,25 @@ window.onload = function() {
     }
   }
   
+  function Brick( x, y, life){
+    this.px = x;
+    this.py = y;
+    this.width = 20;
+    this.height = 10;
+    this.life = life;
+    this.alive = true;
+
+    this.draw = function() {
+      ctx.beginPath();
+      ctx.rect(this.px ,this.py , this.width, this.height);
+      ctx.stroke();
+    };
+
+    
+  }
+
   function Ball() {
-    this.r = 4;
+    this.r = 3;
     this.speed = 4;
     this.px = canv.width / 2;
     this.py = canv.height / 2;
@@ -72,7 +96,6 @@ window.onload = function() {
         this.vy = -Math.sin(a) * this.speed;
         this.py = player.py - this.r;
       }
-
       if (this.py > canv.height - this.r) {
         /* this.vy = -this.vy;
         this.py = canv.height - this.r; */
@@ -80,6 +103,12 @@ window.onload = function() {
       }
     };
   
+    this.intersect = function(brick){
+        if(this.px > brick.px && this.px < brick.px + brick.width && this.py > brick.py && this.py < brick.py + brick.height){
+          console.log('boom');
+        }
+    };
+
     this.draw = function() {
       ctx.beginPath();
       ctx.arc(this.px, this.py, this.r, 0, 2 * Math.PI);
@@ -107,14 +136,28 @@ window.onload = function() {
     ctx.fillStyle = "black";
     balls.forEach(function(item) {
       item.update();
+      bricks.forEach(function(brick){
+        item.intersect(brick);
+      });
       item.draw();
     });
-    var i = balls.length;
+    
+    var i = bricks.length;
+    while(i--){
+      if(bricks[i].alive === false ){
+        bricks.splice(i,1);
+      }
+    }
+
+    bricks.forEach(function(brick){
+      brick.draw();
+    });
+
+    i = balls.length;
     while(i--){
       if(balls[i].alive === false ){
         balls.splice(i,1);
       }
-      
     }
     player.draw();
 
