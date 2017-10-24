@@ -9,9 +9,9 @@ window.onload = function() {
     player = new Player();
 
     bricks = [];
-    var n = 5;
+    var n = 50;
     while (n--) {
-      bricks.push(new Brick(n%10*20+50 , Math.floor(n/10)*10 + 100, 1));
+      bricks.push(new Brick(n%10*20+50 , Math.floor(n/10)*10 + 100, 3));
     }
 
     balls = [];
@@ -54,11 +54,20 @@ window.onload = function() {
     this.life = life;
 
     this.draw = function() {
-      ctx.beginPath();
-      ctx.rect(this.px ,this.py , this.width, this.height);
-      ctx.stroke();
+      switch(this.life){
+        case 2:  
+          ctx.fillStyle = "orange";
+          break;
+          case 1:  
+          ctx.fillStyle = "red";
+          break;
+          default :
+          ctx.fillStyle = "black";
+          break;
+       }
+      ctx.fillRect(this.px ,this.py , this.width, this.height);
     };
-
+    
     
   }
 
@@ -104,7 +113,6 @@ window.onload = function() {
   
     this.intersect = function(brick){
         if(this.px > brick.px && this.px < brick.px + brick.width && this.py > brick.py && this.py < brick.py + brick.height){
-          console.log('boom');
           if( (this.px-this.vx < brick.px || this.px-this.vx > brick.px+brick.width) && this.py-this.vy > brick.py && this.py-this.vy < brick.py + brick.height){
             this.vx=-this.vx;
           }
@@ -116,10 +124,11 @@ window.onload = function() {
     };
 
     this.draw = function() {
+      ctx.fillStyle = "green";
       ctx.beginPath();
       ctx.arc(this.px, this.py, this.r, 0, 2 * Math.PI);
-      //ctx.fill();
-      ctx.stroke();
+      ctx.fill();
+      //ctx.stroke();
     };
   }
   
@@ -131,6 +140,7 @@ window.onload = function() {
     this.speed = 10;
 
     this.draw = function(){
+      ctx.fillStyle = "black";
       ctx.beginPath();
       ctx.rect(this.px - this.width/2, this.py, this.width, this.thickness);
       ctx.stroke();
@@ -139,7 +149,7 @@ window.onload = function() {
 
   function tick() {
     ctx.clearRect(0, 0, canv.width, canv.height);
-    ctx.fillStyle = "black";
+    
     balls.forEach(function(item) {
       item.update();
       bricks.forEach(function(brick){
@@ -163,10 +173,10 @@ window.onload = function() {
     while(i--){
       if(balls[i].alive === false ){
         balls.splice(i,1);
+
       }
     }
     player.draw();
 
     count.innerHTML = balls.length;
   }
-  
