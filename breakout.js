@@ -3,11 +3,11 @@ window.onload = function() {
     canv.width = 300;
     canv.height = 500;
     ctx = canv.getContext("2d");
-    document.addEventListener("keydown", keyPush);
+    document.addEventListener("keydown", keyDown);
+    document.addEventListener("keyup", keyUp);
     walls = [];
     
     player = new Player();
-
     bricks = [];
     var n = 50;
     while (n--) {
@@ -20,16 +20,28 @@ window.onload = function() {
       balls.push(new Ball());
     }
     count = document.getElementById("count");
-    setInterval(tick, 1000 / 60);
+    /* setInterval(tick, 1000 / 60); */
+    tick();
   };
   
-  function keyPush(evt) {
+  function keyUp(evt) {
+    switch (evt.keyCode) {
+      case 37: //left
+      case 39: //right
+        player.move = 0;
+        break;
+    }
+  }
+
+  function keyDown(evt) {
+    
     switch (evt.keyCode) {
       case 37: //left
        /*  balls.forEach(function(brick) {
           if(brick.r>1){brick.r--;}
         }); */
-        if(player.px>player.width/2){player.px = player.px - player.speed;}
+        /* if(player.px>player.width/2){player.px = player.px - player.speed;} */
+        player.move = -1;
         break;
       case 38: //up
         balls.push(new Ball());
@@ -38,7 +50,8 @@ window.onload = function() {
        /*  balls.forEach(function(brick) {
           if(brick.r<40){brick.r++;}
         }); */
-        if(player.px<canv.width-player.width/2){player.px = player.px + player.speed;}
+        /* if(player.px<canv.width-player.width/2){player.px = player.px + player.speed;} */
+        player.move = 1;
         break;
       case 40: //down
         balls.pop();
@@ -73,7 +86,7 @@ window.onload = function() {
 
   function Ball() {
     this.r = 3;
-    this.speed = 4;
+    this.speed = 300;
     this.px = canv.width / 2;
     this.py = canv.height / 2;
     var a = Math.random() * Math.PI * 2;
@@ -81,9 +94,9 @@ window.onload = function() {
     this.vy = Math.sin(a) * this.speed;
     this.alive = true;
   
-    this.update = function() {
-      this.px += this.vx;
-      this.py += this.vy;
+    this.update = function(dt) {
+      this.px += this.vx * dt;
+      this.py += this.vy * dt;
       if (this.px < this.r) {
         this.vx = -this.vx;
         this.px = this.r;
@@ -135,11 +148,15 @@ window.onload = function() {
   function Player(){
     this.px = canv.width / 2;
     this.py = canv.height - 30;
-    this.width = 150;
+    this.width = 140;
     this.thickness = 5;
     this.speed = 10;
+    this.move = 0;
 
     this.draw = function(){
+      if(this.px + this.move * this.speed <=canv.width-this.width/2 && this.px + this.move * this.speed>=this.width/2){
+        this.px = this.px + this.move * this.speed;
+      }
       ctx.fillStyle = "black";
       ctx.beginPath();
       ctx.rect(this.px - this.width/2, this.py, this.width, this.thickness);
@@ -147,11 +164,14 @@ window.onload = function() {
     };
   }
 
-  function tick() {
+  var dt = 0;
+  var lastTime = 0;
+  function tick(time) {
+    dt = (time - lastTime) / 1000;
     ctx.clearRect(0, 0, canv.width, canv.height);
     
     balls.forEach(function(item) {
-      item.update();
+      item.update(dt);
       bricks.forEach(function(brick){
         item.intersect(brick);
       });
@@ -179,4 +199,6 @@ window.onload = function() {
     player.draw();
 
     count.innerHTML = balls.length;
+    lastTime = time;
+    requestAnimationFrame(tick);
   }
